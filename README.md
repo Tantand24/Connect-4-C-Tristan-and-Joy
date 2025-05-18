@@ -1,1 +1,1 @@
-# Connect-4-C-Tritan-and-Joy
+# Connect-4-C-Tristan-and-Joy
