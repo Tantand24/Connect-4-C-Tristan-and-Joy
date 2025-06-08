@@ -32,6 +32,11 @@
         {
 
         }
+
+        public void UpdateBoard()
+        {
+            
+        }
     }
 
     internal class Program
