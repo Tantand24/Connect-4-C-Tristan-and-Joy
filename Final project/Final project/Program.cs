@@ -7,7 +7,7 @@
 
         public virtual void MakeMove()
         {
-
+            //run the update board method
         }
     }
 
@@ -25,17 +25,24 @@
 
         public void DisplayBoard()
         {
-
+            //display board
         }
 
         public void CheckWin()
         {
+            //check vertical 
 
+            //check horizontal 
+
+            // check left diagonal
+
+            // check right diagonal
+            
         }
 
         public void UpdateBoard()
         {
-            
+            // take in user input to update board
         }
     }
 
