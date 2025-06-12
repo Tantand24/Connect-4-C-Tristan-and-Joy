@@ -94,7 +94,7 @@
             Display();
         }
     
-        public bool isCheckWin()
+        public bool isWin()
         {
             for (int i = 0; i < _row - 1; i++)
             {
@@ -136,6 +136,18 @@
                 }
             }
             return false;
+        }
+
+        public bool isTie()
+        {
+            for (int j = 0; j < _column; j++)
+            {
+                if (_board[0,j] == "_")
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
             
