@@ -1,34 +1,36 @@
 ﻿namespace Final_project
 {
-    public abstract class Player
+    public interface IPlayer
     {
-        public string Name { get; set; }
-        public bool XorO { get; set; }
+        string Name { get; }
+        string Character { get; }
 
-        public Player(string name, string xoro)
+        void MakeMove(Board board);
+
+        public class Human : IPlayer
         {
-              Name = name;
-              XorO = xoro;
+            public string Name { get; }
+            public string Character { get; }
+
+            public Human(string name, string character)
+            {
+                Name = name;
+                Character = character;
+            }
+
+            public void MakeMove(Board board) 
+            {
+                Console.WriteLine($"{Name}, Make your move! Enter a column (1-7): ");
+                int column;
+
+                while (!int.TryParse(Console.ReadLine(), out column) || column < 1 || column > 7)
+                {
+                    Console.Write("Invalid input. Make another choice: ");
+                }
+
+            }
+
         }
-
-        public virtual void MakeMove()
-        {
-            //run the update board method
-        }
-    }
-
-    public class Human :Player
-    {
-        public Human(string name, string xoro) : base(name, xoro){}
-
-        public override MakeMove(Board board)
-        {
-             Console.WriteLine($"{Name}, Make your move (1-7): ");
-             int column; 
-        }
-        
-    }
-
     //public class AI : player
 
     public class Board
