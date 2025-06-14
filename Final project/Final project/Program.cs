@@ -1,45 +1,48 @@
 ﻿namespace Final_project
 {
-    public interface IPlayer
-    {
-        string Name { get; }
-        string Character { get; }
+     public interface IPlayer
+ {
+     string Name { get; }
+     string Character { get; } 
+     int GetMove(string[,] board);
+ }
 
-        void MakeMove(Board board);
+ public class Human : IPlayer
+ {
+     public string Name { get; private set; }
+     public string Character { get; private set; }
 
-    public class Human : IPlayer
-    {
-        public string Name { get; }
-        public string Character { get; }
+     
+     public Human(string name, string character)
+     {
+         Name = name;
+         Character = character;
+     }
 
-        public Human(string name, string character)
-        {
-            Name = name;
-            Character = character;
-        }
+  
+     public int GetMove(string[,] board)
+     {
+         int column;
+         Console.Write($"{Name}, make a move! Enter the column (1-7): "); 
 
-        public void MakeMove(Board board) 
-        {
-            Console.WriteLine($"{Name}, Make your move! Enter a column (1-7): ");
-            int column;
+         do
+         {
+             if (int.TryParse(Console.ReadLine(), out column) && column >= 1 && column <= board.GetLength(1))
+                    return column - 1;
 
-            while (!int.TryParse(Console.ReadLine(), out column) || column < 1 || column > 7)
-            {
-                Console.Write("Invalid input. Make another choice: ");
-            }
-
-        }
-
-    }
+             Console.Write("Invalid input. Make another choice, choose a column (1-7): ");
+         } while (true);
+     }
+ }
     //public class AI : player
 
-    public class Boards
+    public class Board
     {
         private string[,] _board { get; set; }
         private int _row { get; }
         private int _column { get; }
     
-        public Boards()
+        public Board()
         {
             _row = _column = 7;
             _board = new string[_row, _column];
