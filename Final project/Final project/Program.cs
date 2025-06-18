@@ -1,10 +1,10 @@
-﻿namespace Final_project
+    ﻿namespace Final_project
 {
-     public interface IPlayer
+    public interface IPlayer
  {
      string Name { get; }
-     string Character { get; } 
-     int GetMove(string[,] board);
+     string Character { get; }
+     int GetMove();
  }
 
  public class Human : IPlayer
@@ -12,28 +12,28 @@
      public string Name { get; private set; }
      public string Character { get; private set; }
 
-     
      public Human(string name, string character)
      {
          Name = name;
          Character = character;
      }
+     
+        public int GetMove()
+        {
+            int column;
+            Console.Write($"{Name}, choose a column (1-7): ");
 
-  
-     public int GetMove(string[,] board)
-     {
-         int column;
-         Console.Write($"{Name}, make a move! Enter the column (1-7): "); 
+            while (true)
+            {
+                string input = Console.ReadLine();
 
-         do
-         {
-             if (int.TryParse(Console.ReadLine(), out column) && column >= 1 && column <= board.GetLength(1))
+                if (int.TryParse(input, out column) && column >= 1 && column <= 7)
                     return column - 1;
 
-             Console.Write("Invalid input. Make another choice, choose a column (1-7): ");
-         } while (true);
-     }
- }
+                Console.WriteLine("Invalid input. Please choose a number between 1 and 7.");
+            }
+        }
+    }
     //public class AI : player
 
     public class Boards
@@ -391,7 +391,7 @@
                         ShowPastGame();
                     }
                 }
-                catch (GameExecption e)
+                catch (GameException e)
                 {
                     Console.WriteLine(e.Message);
                 }
