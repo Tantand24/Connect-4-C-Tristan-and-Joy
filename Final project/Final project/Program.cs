@@ -1,4 +1,4 @@
-    ﻿namespace Final_project
+﻿    ﻿namespace Final_project
 {
     public interface IPlayer
  {
@@ -28,7 +28,7 @@
                 string input = Console.ReadLine();
 
                 if (int.TryParse(input, out column) && column >= 1 && column <= 7)
-                    return column - 1;
+                    return column;
 
                 Console.WriteLine("Invalid input. Please choose a number between 1 and 7.");
             }
@@ -407,7 +407,6 @@
         //the main game loop to take input and update board
         public void mainGameloop()
         {
-            string input;
             while (!isWinOrTie())
             {
                 try
@@ -436,16 +435,6 @@
                         _currentplayer = player1.Name;
                         TurnCounter++;
                     }
-
-                    //if (input == "forfeit")
-                    //{
-                    //    forfeit();
-                    //    break;
-                    //}
-                    //else if (string.IsNullOrWhiteSpace(input))
-                    //{
-                    //    throw new GameExecption("Please input something");
-                    //}
 
                     if (TurnCounter % 2 != 0)
                     {
@@ -483,12 +472,6 @@
             {
                 return false;
             }
-        }
-
-        //to allow a player to forfeit
-        public void forfeit()
-        {
-
         }
 
         //to start a new game after a game have ended
