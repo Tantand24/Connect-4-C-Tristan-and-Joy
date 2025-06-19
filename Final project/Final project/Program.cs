@@ -36,7 +36,7 @@
     }
     //public class AI : player
 
-    public class Boards
+        public class Boards
     {
         private string[,] _board { get; set; }
         private int _row { get; }
@@ -97,7 +97,7 @@
                     }
                     else
                     {
-                        throw new GameExecption("Column is full");
+                        throw new GameException("Column is full");
                     }
                 }
             }
@@ -107,7 +107,7 @@
         {
             for (int i = 0; i < _row - 1; i++)
             {
-                if(i < _row - 4)
+                if (i < _row - 4)
                 {
                     for (int j = 0; j < _column; j++)
                     {
@@ -151,7 +151,7 @@
         {
             for (int j = 0; j < _column; j++)
             {
-                if (_board[0,j] == "_")
+                if (_board[0, j] == "_")
                 {
                     return false;
                 }
@@ -160,9 +160,9 @@
         }
     }
 
-    public class GameExecption : Exception
+    public class GameException : Exception
     {
-        public GameExecption(string message) : base(message)
+        public GameException(string message) : base(message)
         {
 
         }
@@ -192,35 +192,186 @@
         public void AddOrUpdateplayer()
         {
             string input;
-            while (true)
+            int postion;
+            string name;
+            bool isAiOn;
+
+            if (player1 == null && player2 == null)
             {
-                try
+                while (true)
                 {
-                    input = Console.ReadLine();
-                    string[] cmd = input.Split();
-                    int postion = int.Parse(cmd[0]);
-                    if (postion > 2 && postion < 1)
+                    try
                     {
-                        throw new GameExecption("player postion is out of bound");
+                        if (player1 == null && player2 == null)
+                        {
+                            Console.WriteLine("Input a 1 or 2 for either player 1 or 2");
+                            input = Console.ReadLine();
+                            postion = int.Parse(input);
+                            if (postion > 2 && postion < 1)
+                            {
+                                throw new GameException("player postion is out of bound");
+                            }
+
+                            Console.WriteLine("Input Player name");
+                            input = Console.ReadLine();
+                            name = input;
+                            if (string.IsNullOrWhiteSpace(name))
+                            {
+                                throw new GameException("Cant leave Name blank");
+                            }
+
+                            Console.WriteLine("Do you want ai turn on for this player (Y/N)");
+                            input = Console.ReadLine();
+                            string ai = input.ToUpper();
+                            if (ai == "Y")
+                            {
+                                isAiOn = true;
+                            }
+                            else if (ai == "N")
+                            {
+                                isAiOn = false;
+                            }
+                            else
+                            {
+                                throw new GameException("Input must be y or n");
+                            }
+                        }
+                        else if (player1 == null)
+                        {
+                            postion = 1;
+
+                            Console.WriteLine("Input Player1 name");
+                            input = Console.ReadLine();
+                            name = input;
+                            if (string.IsNullOrWhiteSpace(name))
+                            {
+                                throw new GameException("Can't leave Name blank");
+                            }
+                            else if (name == player2.Name)
+                            {
+                                throw new GameException("Can't have the same name as player 2");
+                            }
+
+                            Console.WriteLine("Do you want ai turn on for this player (Y/N)");
+                            input = Console.ReadLine();
+                            string ai = input.ToUpper();
+                            if (ai == "Y")
+                            {
+                                isAiOn = true;
+                            }
+                            else if (ai == "N")
+                            {
+                                isAiOn = false;
+                            }
+                            else
+                            {
+                                throw new GameException("Input must be y or n");
+                            }
+                        }
+                        else if (player2 == null)
+                        {
+                            postion = 2;
+
+                            Console.WriteLine("Input Player2 name");
+                            input = Console.ReadLine();
+                            name = input;
+                            if (string.IsNullOrWhiteSpace(name))
+                            {
+                                throw new GameException("Can't leave Name blank");
+                            }
+                            else if (name == player1.Name)
+                            {
+                                throw new GameException("Can't have the same name as player 1");
+                            }
+
+                            Console.WriteLine("Do you want ai turn on for this player (Y/N)");
+                            input = Console.ReadLine();
+                            string ai = input.ToUpper();
+                            if (ai == "Y")
+                            {
+                                isAiOn = true;
+                            }
+                            else if (ai == "N")
+                            {
+                                isAiOn = false;
+                            }
+                            else
+                            {
+                                throw new GameException("Input must be y or n");
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                        createPlayer(postion, name, isAiOn);
                     }
-
-
-                    if (player1 == null || player2 == null)
+                    catch (FormatException)
                     {
-
+                        Console.WriteLine("Not valid input for postion");
                     }
-                    else
+                    catch (GameException e)
                     {
-
+                        Console.WriteLine(e.Message);
                     }
                 }
-                catch (FormatException)
+            }
+            else
+            {
+                while (true)
                 {
-                    Console.WriteLine("Not valid input for postion");
-                }
-                catch (GameExecption e)
-                {
-                    Console.WriteLine(e.Message);
+                    try
+                    {
+                        Console.WriteLine("Input a 1 or 2 for either player 1 or 2");
+                        input = Console.ReadLine();
+                        postion = int.Parse(input);
+                        if (postion > 2 && postion < 1)
+                        {
+                            throw new GameException("player postion is out of bound");
+                        }
+
+                        Console.WriteLine("Input Player name");
+                        input = Console.ReadLine();
+                        name = input;
+                        if (string.IsNullOrWhiteSpace(name))
+                        {
+                            throw new GameException("Cant leave Name blank");
+                        }
+                        else if (postion == 1 && player2.Name == name)
+                        {
+                            throw new GameException("Can't have the same name as player 2");
+                        }
+                        else if (postion == 2 && player1.Name == name)
+                        {
+                            throw new GameException("Can't have the same name as player 1");
+                        }
+
+                        Console.WriteLine("Do you want ai turn on for this player (Y/N)");
+                        input = Console.ReadLine();
+                        string ai = input.ToUpper();
+                        if (ai == "Y")
+                        {
+                            isAiOn = true;
+                        }
+                        else if (ai == "N")
+                        {
+                            isAiOn = false;
+                        }
+                        else
+                        {
+                            throw new GameException("Input must be y or n");
+                        }
+                        createPlayer(postion, name, isAiOn);
+                        break;
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Not valid input for postion");
+                    }
+                    catch (GameException e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
             }
         }
@@ -264,33 +415,44 @@
                     Console.WriteLine("It {0} turn", _currentplayer);
                     Console.WriteLine("Turn number {0}", TurnCounter);
                     gameBoard.Display();
-                    input = Console.ReadLine();
 
                     if (_currentplayer == player1.Name)
                     {
-                        gameBoard.Update(player1.GetMove(input), player1);
+                        gameBoard.Update(player1.GetMove(), player1);
+                        if (isWinOrTie())
+                        {
+                            break;
+                        }
                         _currentplayer = player2.Name;
                         TurnCounter++;
                     }
                     else if (_currentplayer == player2.Name)
                     {
-                        gameBoard.Update(player2.GetMove(input), player2);
+                        gameBoard.Update(player2.GetMove(), player2);
+                        if (isWinOrTie())
+                        {
+                            break;
+                        }
                         _currentplayer = player1.Name;
                         TurnCounter++;
                     }
 
-                    if (input == "forfeit")
-                    {
-                        forfeit();
-                    }
+                    //if (input == "forfeit")
+                    //{
+                    //    forfeit();
+                    //    break;
+                    //}
+                    //else if (string.IsNullOrWhiteSpace(input))
+                    //{
+                    //    throw new GameExecption("Please input something");
+                    //}
 
                     if (TurnCounter % 2 != 0)
                     {
                         Console.Clear();
                     }
-                    isWinOrTie();
                 }
-                catch (GameExecption e)
+                catch (GameException e)
                 {
                     Console.WriteLine(e.Message);
                 }
@@ -303,7 +465,7 @@
             if (gameBoard.isWin())
             {
                 Console.WriteLine("The game is over");
-                Console.WriteLine("The winner is {0}", _currentplayer);
+                Console.WriteLine("The winner is {0}\n", _currentplayer);
                 pastBoardGamelist.Add(gameBoard);
                 pastGameturn.Add(TurnCounter);
                 winningPlayer.Add($"the winning player was {_currentplayer}");
@@ -311,7 +473,7 @@
             }
             else if (gameBoard.isTie())
             {
-                Console.WriteLine("The game is over, it a tie");
+                Console.WriteLine("The game is over, it a tie\n");
                 pastBoardGamelist.Add(gameBoard);
                 pastGameturn.Add(TurnCounter);
                 winningPlayer.Add("it was a tie");
@@ -332,63 +494,92 @@
         //to start a new game after a game have ended
         public void newGame()
         {
-
+            Console.WriteLine("swtiching player 1 and player 2 postion");
+            IPlayer tempPlayer = player1;
+            player1 = player2;
+            player2 = tempPlayer;
+            setup();
+            mainGameloop();
         }
-        
+
         //display all past game
         public void ShowPastGame()
         {
-            if(pastBoardGamelist.Count == 0)
-            {
-                throw new GameExecption("No past game history, Please a game");
-            }
             for (int i = 0; i < pastBoardGamelist.Count; i++)
             {
                 pastBoardGamelist[i].Display();
-                Console.WriteLine("The game end in {0} turns, and {1}", pastGameturn[i], winningPlayer[i]);
+                Console.WriteLine("The game end in {0} turns, and {1}\n", pastGameturn[i], winningPlayer[i]);
             }
         }
 
         //Just prompt to out text for menu
         public void menuPrompt()
         {
-            Console.WriteLine("The game main menu");
-            Console.WriteLine("To update player info or change a player to ai type: player");
-            Console.WriteLine("To play the game type: play");
-            Console.WriteLine("To setup a new game and play type: Newgame");
-            Console.WriteLine("To view past games type: past game");
+            if (pastBoardGamelist.Count == 0)
+            {
+                Console.WriteLine("The game main menu");
+                Console.WriteLine("To update player info or change a player to ai type: player");
+                Console.WriteLine("To play the game type: play");
+            }
+            else
+            {
+                Console.WriteLine("The game main menu");
+                Console.WriteLine("To update player info or change a player to ai type: player");
+                Console.WriteLine("To setup a new game and play type: Newgame");
+                Console.WriteLine("To view past games type: past");
+            }
         }
-        
+
         //Menu loop
         public void gameloop()
         {
-
             string input;
 
-            while ((input = Console.ReadLine()) != "exit")
-            {
-                string cmd = input.ToLower();
+            Console.WriteLine("Welcome To Tristan and Joy Connect 4 game");
+            AddOrUpdateplayer();
+            Console.Clear();
 
+            while (true)
+            {
                 try
                 {
-                    menuPrompt();
+                    if (pastBoardGamelist.Count() == 0)
+                    {
+                        menuPrompt();
+                        input = Console.ReadLine();
+                        string cmd = input.ToLower();
 
-                    if (cmd == "player")
+                        if (cmd == "player")
+                        {
+                            AddOrUpdateplayer();
+                        }
+                        else if (cmd == "play")
+                        {
+                            Console.Clear();
+                            setup();
+                            mainGameloop();
+                        }
+                    }
+                    else
                     {
+                        menuPrompt();
+                        input = Console.ReadLine();
+                        string cmd = input.ToLower();
 
-                    }
-                    else if (cmd == "play")
-                    {
-                        setup();
-                        mainGameloop();
-                    }
-                    else if (cmd == "newgame")
-                    {
-                        newGame();
-                    }
-                    else if (cmd == "past game")
-                    {
-                        ShowPastGame();
+                        if (cmd == "player")
+                        {
+                            AddOrUpdateplayer();
+                        }
+                        else if (cmd == "newgame")
+                        {
+                            Console.Clear();
+                            newGame();
+                        }
+                        else if (cmd == "past")
+                        {
+                            Console.Clear();
+                            ShowPastGame();
+                        }
                     }
                 }
                 catch (GameException e)
@@ -398,12 +589,13 @@
             }
         }
     }
-            
+
     internal class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            Games mainprogram = new Games();
+            mainprogram.gameloop();
         }
     }
 }
