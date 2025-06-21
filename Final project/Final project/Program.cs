@@ -36,6 +36,131 @@
     }
     //public class AI : player
 
+     public class AI : IPlayer
+ {
+     public string Name { get; private set; }
+     public string Character { get; private set; }
+
+     private Boards _boardRef;
+     private IPlayer _opponent;
+     private Random _random;
+
+     public AI(string name, string character)
+     {
+         Name = name;
+         Character = character;
+         _random = new Random();
+     }
+
+     // Called once before each move to provide board context
+     public void SetGameState(Boards board, IPlayer opponent)
+     {
+         _boardRef = board;
+         _opponent = opponent;
+     }
+
+     // Interface method
+     public int GetMove()
+     {
+         return GetMove(_boardRef, _opponent);
+     }
+
+     // AI logic
+     public int GetMove(Boards board, IPlayer opponent)
+     {
+         string[,] grid = board.GetBoard();
+
+         for (int col = 1; col <= 7; col++)
+         {
+             int row = GetPlayableRow(grid, col - 1);
+             if (row == -1) continue;
+
+             // Try winning
+             grid[row, col - 1] = Character;
+             if (CheckWinSim(grid, row, col - 1))
+             {
+                 grid[row, col - 1] = "_";
+                 Console.WriteLine($"{Name} (AI) plays column {col} to win");
+                 return col;
+             }
+             grid[row, col - 1] = "_";
+
+             // Try blocking
+             grid[row, col - 1] = opponent.Character;
+             if (CheckWinSim(grid, row, col - 1))
+             {
+                 grid[row, col - 1] = "_";
+                 Console.WriteLine($"{Name} (AI) blocks column {col}");
+                 return col;
+             }
+             grid[row, col - 1] = "_";
+         }
+
+         // Random fallback
+         List<int> valid = new List<int>();
+         for (int col = 1; col <= 7; col++)
+         {
+             if (GetPlayableRow(grid, col - 1) != -1)
+                 valid.Add(col);
+         }
+
+         int choice = valid[_random.Next(valid.Count)];
+         Console.WriteLine($"{Name} (AI) chooses column {choice}");
+         return choice;
+     }
+
+     private int GetPlayableRow(string[,] board, int col)
+     {
+         for (int row = board.GetLength(0) - 2; row >= 0; row--) // Skip label row
+         {
+             if (board[row, col] == "_")
+                 return row;
+         }
+         return -1;
+     }
+
+     private bool CheckWinSim(string[,] board, int row, int col)
+     {
+         string token = board[row, col];
+         if (token == "_") return false;
+
+         int[] dx = { 1, 0, 1, 1 };
+         int[] dy = { 0, 1, -1, 1 };
+
+         for (int dir = 0; dir < 4; dir++)
+         {
+             int count = 1;
+             count += CountInDirection(board, row, col, dx[dir], dy[dir], token);
+             count += CountInDirection(board, row, col, -dx[dir], -dy[dir], token);
+             if (count >= 4)
+                 return true;
+         }
+         return false;
+     }
+
+     private int CountInDirection(string[,] board, int row, int col, int dr, int dc, string token)
+     {
+         int count = 0;
+         int r = row + dr;
+         int c = col + dc;
+
+         while (r >= 0 && r < board.GetLength(0) - 1 && c >= 0 && c < board.GetLength(1))
+         {
+             if (board[r, c] == token)
+             {
+                 count++;
+                 r += dr;
+                 c += dc;
+             }
+             else break;
+         }
+         return count;
+     }
+ }
+
+
+
+
         public class Boards
     {
         private string[,] _board { get; set; }
@@ -47,6 +172,11 @@
             _row = _column = 7;
             _board = new string[_row, _column];
             Setup();
+        }
+
+        public string[,] GetBoard()
+        {
+            return _board;
         }
 
         public void Setup()
