@@ -1,23 +1,23 @@
 ﻿    ﻿namespace Final_project
 {
-    public interface IPlayer
- {
-     string Name { get; }
-     string Character { get; }
-     int GetMove();
- }
+        public interface IPlayer
+    {
+        string Name { get; }
+        string Character { get; }
+        int GetMove();
+    }
 
- public class Human : IPlayer
- {
-     public string Name { get; private set; }
-     public string Character { get; private set; }
+    public class Human : IPlayer
+    {
+        public string Name { get; private set; }
+        public string Character { get; private set; }
 
-     public Human(string name, string character)
-     {
-         Name = name;
-         Character = character;
-     }
-     
+        public Human(string name, string character)
+        {
+            Name = name;
+            Character = character;
+        }
+
         public int GetMove()
         {
             int column;
@@ -34,134 +34,130 @@
             }
         }
     }
-    //public class AI : player
 
-     public class AI : IPlayer
- {
-     public string Name { get; private set; }
-     public string Character { get; private set; }
+    public class AI : IPlayer
+    {
+        public string Name { get; private set; }
+        public string Character { get; private set; }
 
-     private Boards _boardRef;
-     private IPlayer _opponent;
-     private Random _random;
+        private Boards _boardRef;
+        private IPlayer _opponent;
+        private Random _random;
 
-     public AI(string name, string character)
-     {
-         Name = name;
-         Character = character;
-         _random = new Random();
-     }
+        public AI(string name, string character)
+        {
+            Name = name;
+            Character = character;
+            _random = new Random();
+        }
 
-     // Called once before each move to provide board context
-     public void SetGameState(Boards board, IPlayer opponent)
-     {
-         _boardRef = board;
-         _opponent = opponent;
-     }
+        // Called once before each move to provide board context
+        public void SetGameState(Boards board, IPlayer opponent)
+        {
+            _boardRef = board;
+            _opponent = opponent;
+        }
 
-     // Interface method
-     public int GetMove()
-     {
-         return GetMove(_boardRef, _opponent);
-     }
+        // Interface method
+        public int GetMove()
+        {
+            return GetMove(_boardRef, _opponent);
+        }
 
-     // AI logic
-     public int GetMove(Boards board, IPlayer opponent)
-     {
-         string[,] grid = board.GetBoard();
+        // AI logic
+        public int GetMove(Boards board, IPlayer opponent)
+        {
+            string[,] grid = board.GetBoard();
 
-         for (int col = 1; col <= 7; col++)
-         {
-             int row = GetPlayableRow(grid, col - 1);
-             if (row == -1) continue;
+            for (int col = 1; col <= 7; col++)
+            {
+                int row = GetPlayableRow(grid, col - 1);
+                if (row == -1) continue;
 
-             // Try winning
-             grid[row, col - 1] = Character;
-             if (CheckWinSim(grid, row, col - 1))
-             {
-                 grid[row, col - 1] = "_";
-                 Console.WriteLine($"{Name} (AI) plays column {col} to win");
-                 return col;
-             }
-             grid[row, col - 1] = "_";
+                // Try winning
+                grid[row, col - 1] = Character;
+                if (CheckWinSim(grid, row, col - 1))
+                {
+                    grid[row, col - 1] = "_";
+                    Console.WriteLine($"{Name} (AI) plays column {col} to win");
+                    return col;
+                }
+                grid[row, col - 1] = "_";
 
-             // Try blocking
-             grid[row, col - 1] = opponent.Character;
-             if (CheckWinSim(grid, row, col - 1))
-             {
-                 grid[row, col - 1] = "_";
-                 Console.WriteLine($"{Name} (AI) blocks column {col}");
-                 return col;
-             }
-             grid[row, col - 1] = "_";
-         }
+                // Try blocking
+                grid[row, col - 1] = opponent.Character;
+                if (CheckWinSim(grid, row, col - 1))
+                {
+                    grid[row, col - 1] = "_";
+                    Console.WriteLine($"{Name} (AI) blocks column {col}");
+                    return col;
+                }
+                grid[row, col - 1] = "_";
+            }
 
-         // Random fallback
-         List<int> valid = new List<int>();
-         for (int col = 1; col <= 7; col++)
-         {
-             if (GetPlayableRow(grid, col - 1) != -1)
-                 valid.Add(col);
-         }
+            // Random fallback
+            List<int> valid = new List<int>();
+            for (int col = 1; col <= 7; col++)
+            {
+                if (GetPlayableRow(grid, col - 1) != -1)
+                    valid.Add(col);
+            }
 
-         int choice = valid[_random.Next(valid.Count)];
-         Console.WriteLine($"{Name} (AI) chooses column {choice}");
-         return choice;
-     }
+            int choice = valid[_random.Next(valid.Count)];
+            Console.WriteLine($"{Name} (AI) chooses column {choice}");
+            return choice;
+        }
 
-     private int GetPlayableRow(string[,] board, int col)
-     {
-         for (int row = board.GetLength(0) - 2; row >= 0; row--) // Skip label row
-         {
-             if (board[row, col] == "_")
-                 return row;
-         }
-         return -1;
-     }
+        private int GetPlayableRow(string[,] board, int col)
+        {
+            for (int row = board.GetLength(0) - 2; row >= 0; row--) // Skip label row
+            {
+                if (board[row, col] == "_")
+                    return row;
+            }
+            return -1;
+        }
 
-     private bool CheckWinSim(string[,] board, int row, int col)
-     {
-         string token = board[row, col];
-         if (token == "_") return false;
+        private bool CheckWinSim(string[,] board, int row, int col)
+        {
+            string token = board[row, col];
+            if (token == "_") return false;
 
-         int[] dx = { 1, 0, 1, 1 };
-         int[] dy = { 0, 1, -1, 1 };
+            int[] dx = { 1, 0, 1, 1 };
+            int[] dy = { 0, 1, -1, 1 };
 
-         for (int dir = 0; dir < 4; dir++)
-         {
-             int count = 1;
-             count += CountInDirection(board, row, col, dx[dir], dy[dir], token);
-             count += CountInDirection(board, row, col, -dx[dir], -dy[dir], token);
-             if (count >= 4)
-                 return true;
-         }
-         return false;
-     }
+            for (int dir = 0; dir < 4; dir++)
+            {
+                int count = 1;
+                count += CountInDirection(board, row, col, dx[dir], dy[dir], token);
+                count += CountInDirection(board, row, col, -dx[dir], -dy[dir], token);
+                if (count >= 4)
+                    return true;
+            }
+            return false;
+        }
 
-     private int CountInDirection(string[,] board, int row, int col, int dr, int dc, string token)
-     {
-         int count = 0;
-         int r = row + dr;
-         int c = col + dc;
+        private int CountInDirection(string[,] board, int row, int col, int dr, int dc, string token)
+        {
+            int count = 0;
+            int r = row + dr;
+            int c = col + dc;
 
-         while (r >= 0 && r < board.GetLength(0) - 1 && c >= 0 && c < board.GetLength(1))
-         {
-             if (board[r, c] == token)
-             {
-                 count++;
-                 r += dr;
-                 c += dc;
-             }
-             else break;
-         }
-         return count;
-     }
- }
+            while (r >= 0 && r < board.GetLength(0) - 1 && c >= 0 && c < board.GetLength(1))
+            {
+                if (board[r, c] == token)
+                {
+                    count++;
+                    r += dr;
+                    c += dc;
+                }
+                else break;
+            }
+            return count;
+        }
+    }
 
-
-
-
-        public class Boards
+    public class Boards
     {
         private string[,] _board { get; set; }
         private int _row { get; }
@@ -266,7 +262,7 @@
                 }
 
                 //check horizontal
-                for (int j = 0; j < _column - 4; j++)
+                for (int j = 0; j < _column - 3; j++)
                 {
                     if (_board[i, j] != "_" && _board[i, j] == _board[i, j + 1] && _board[i, j + 1] == _board[i, j + 2] && _board[i, j + 2] == _board[i, j + 3])
                     {
@@ -304,8 +300,10 @@
         private Boards gameBoard;
 
         private List<string> winningPlayer;
-        private IPlayer player1;
+        private IPlayer? player1;
         private IPlayer player2;
+        private AI Aiplayer1;
+        private AI Aiplayer2;
         private string _currentplayer;
 
         private List<int> pastGameturn;
@@ -342,56 +340,67 @@
                                 throw new GameException("player postion is out of bound");
                             }
 
-                            Console.WriteLine("Input Player name");
-                            input = Console.ReadLine();
-                            name = input;
-                            if (string.IsNullOrWhiteSpace(name))
-                            {
-                                throw new GameException("Can't leave Name blank");
-                            }
-
                             Console.WriteLine("Do you want AI turn on for this player (Y/N)");
                             input = Console.ReadLine();
                             string ai = input.ToUpper();
                             if (ai == "Y")
                             {
                                 isAiOn = true;
+                                name = "Ai";
                             }
                             else if (ai == "N")
                             {
                                 isAiOn = false;
+
+                                Console.WriteLine("Input Player name");
+                                input = Console.ReadLine();
+                                name = input;
+                                if (string.IsNullOrWhiteSpace(name))
+                                {
+                                    throw new GameException("Can't leave Name blank");
+                                }
+                                else if (name == "Ai")
+                                {
+                                    throw new GameException("Can't have the same name as Ai");
+                                }
                             }
                             else
                             {
                                 throw new GameException("Input must be y or n");
                             }
+
                         }
                         else if (player1 == null)
                         {
                             postion = 1;
 
-                            Console.WriteLine("Input Player1 Name");
-                            input = Console.ReadLine();
-                            name = input;
-                            if (string.IsNullOrWhiteSpace(name))
-                            {
-                                throw new GameException("Can't leave Name blank");
-                            }
-                            else if (name == player2.Name)
-                            {
-                                throw new GameException("Can't have the same name as player 2");
-                            }
-
-                            Console.WriteLine("Do you want AI turn on for this player (Y/N)");
+                            Console.WriteLine("Do you want AI turn on for player 1 (Y/N)");
                             input = Console.ReadLine();
                             string ai = input.ToUpper();
                             if (ai == "Y")
                             {
                                 isAiOn = true;
+                                name = "Ai";
                             }
                             else if (ai == "N")
                             {
                                 isAiOn = false;
+
+                                Console.WriteLine("Input Player 1 Name");
+                                input = Console.ReadLine();
+                                name = input;
+                                if (string.IsNullOrWhiteSpace(name))
+                                {
+                                    throw new GameException("Can't leave Name blank");
+                                }
+                                else if (name == player2.Name)
+                                {
+                                    throw new GameException("Can't have the same name as player 2");
+                                }
+                                else if (name == "Ai")
+                                {
+                                    throw new GameException("Can't have the same name as Ai");
+                                }
                             }
                             else
                             {
@@ -403,28 +412,32 @@
                         {
                             postion = 2;
 
-                            Console.WriteLine("Input Player2 Name");
-                            input = Console.ReadLine();
-                            name = input;
-                            if (string.IsNullOrWhiteSpace(name))
-                            {
-                                throw new GameException("Can't leave name blank");
-                            }
-                            else if (name == player1.Name)
-                            {
-                                throw new GameException("Can't have the same name as player 1");
-                            }
-
-                            Console.WriteLine("Do you want AI turn on for this player (Y/N)");
+                            Console.WriteLine("Do you want AI turn on for player 2 (Y/N)");
                             input = Console.ReadLine();
                             string ai = input.ToUpper();
                             if (ai == "Y")
                             {
                                 isAiOn = true;
+                                name = "Ai";
                             }
                             else if (ai == "N")
                             {
                                 isAiOn = false;
+                                Console.WriteLine("Input Player 2 Name");
+                                input = Console.ReadLine();
+                                name = input;
+                                if (string.IsNullOrWhiteSpace(name))
+                                {
+                                    throw new GameException("Can't leave name blank");
+                                }
+                                else if (name == player1.Name)
+                                {
+                                    throw new GameException("Can't have the same name as player 1");
+                                }
+                                else if (name == "Ai")
+                                {
+                                    throw new GameException("Can't have the same name as Ai");
+                                }
                             }
                             else
                             {
@@ -461,32 +474,37 @@
                             throw new GameException("player postion is out of bound");
                         }
 
-                        Console.WriteLine("Input Player name");
-                        input = Console.ReadLine();
-                        name = input;
-                        if (string.IsNullOrWhiteSpace(name))
-                        {
-                            throw new GameException("Cant leave Name blank");
-                        }
-                        else if (postion == 1 && player2.Name == name)
-                        {
-                            throw new GameException("Can't have the same name as player 2");
-                        }
-                        else if (postion == 2 && player1.Name == name)
-                        {
-                            throw new GameException("Can't have the same name as player 1");
-                        }
-
                         Console.WriteLine("Do you want ai turn on for this player (Y/N)");
                         input = Console.ReadLine();
                         string ai = input.ToUpper();
                         if (ai == "Y")
                         {
                             isAiOn = true;
+                            name = "Ai";
                         }
                         else if (ai == "N")
                         {
                             isAiOn = false;
+
+                            Console.WriteLine("Input Player name");
+                            input = Console.ReadLine();
+                            name = input;
+                            if (string.IsNullOrWhiteSpace(name))
+                            {
+                                throw new GameException("Cant leave Name blank");
+                            }
+                            else if (postion == 1 && player2.Name == name)
+                            {
+                                throw new GameException("Can't have the same name as player 2");
+                            }
+                            else if (postion == 2 && player1.Name == name)
+                            {
+                                throw new GameException("Can't have the same name as player 1");
+                            }
+                            else if (name == "Ai")
+                            {
+                                throw new GameException("Can't have the same name as Ai");
+                            }
                         }
                         else
                         {
@@ -523,7 +541,16 @@
             }
             else
             {
-
+                if (playerPostion == 1)
+                {
+                    Aiplayer1 = new AI(playerName, "x");
+                    player1 = new Human("Ai", "x");
+                }
+                else if (playerPostion == 2)
+                {
+                    Aiplayer2 = new AI(playerName, "o");
+                    player2 = new Human("Ai", "o");
+                }
             }
         }
 
@@ -531,7 +558,19 @@
         public void setup()
         {
             gameBoard = new Boards();
-            _currentplayer = player1.Name;
+            if(Aiplayer1 != null)
+            {
+                _currentplayer = Aiplayer1.Name;
+                player1 = null;
+            }
+            else
+            {
+                _currentplayer = player1.Name;
+            }
+            if(Aiplayer2 != null)
+            {
+                player2 = null;
+            } 
             TurnCounter = 1;
         }
 
@@ -546,25 +585,90 @@
                     Console.WriteLine("Turn number {0}", TurnCounter);
                     gameBoard.Display();
 
-                    if (_currentplayer == player1.Name)
+                    if (Aiplayer1 != null)
                     {
-                        gameBoard.Update(player1.GetMove(), player1);
-                        if (isWinOrTie())
+                        if (_currentplayer == Aiplayer1.Name)
                         {
-                            break;
+                            Aiplayer1.SetGameState(gameBoard, player2);
+                            gameBoard.Update(Aiplayer1.GetMove(), Aiplayer1);
+                            if (isWinOrTie())
+                            {
+                                break;
+                            }
+                            _currentplayer = player2.Name;
+                            TurnCounter++;
                         }
-                        _currentplayer = player2.Name;
-                        TurnCounter++;
+                        else if (_currentplayer == player2.Name)
+                        {
+                            gameBoard.Update(player2.GetMove(), player2);
+                            if (isWinOrTie())
+                            {
+                                break;
+                            }
+                            if (Aiplayer1 != null)
+                            {
+                                _currentplayer = Aiplayer1.Name;
+                            }
+                            else
+                            {
+                                _currentplayer = player1.Name;
+                            }
+                            TurnCounter++;
+                        }
                     }
-                    else if (_currentplayer == player2.Name)
+                    else if (Aiplayer2 != null)
                     {
-                        gameBoard.Update(player2.GetMove(), player2);
-                        if (isWinOrTie())
+                        if (_currentplayer == player1.Name)
                         {
-                            break;
+                            gameBoard.Update(player1.GetMove(), player1);
+                            if (isWinOrTie())
+                            {
+                                break;
+                            }
+                            if (Aiplayer2 != null)
+                            {
+                                _currentplayer = Aiplayer2.Name;
+                            }
+                            else
+                            {
+                                _currentplayer = player2.Name;
+                            }
+                            TurnCounter++;
                         }
-                        _currentplayer = player1.Name;
-                        TurnCounter++;
+                        else if (_currentplayer == Aiplayer2.Name)
+                        {
+                            Aiplayer2.SetGameState(gameBoard, player1);
+                            gameBoard.Update(Aiplayer2.GetMove(), Aiplayer2);
+                            if (isWinOrTie())
+                            {
+                                break;
+                            }
+                            _currentplayer = player1.Name;
+                            TurnCounter++;
+                        }
+                    }
+                    else
+                    {
+                        if (_currentplayer == player1.Name)
+                        {
+                            gameBoard.Update(player1.GetMove(), player1);
+                            if (isWinOrTie())
+                            {
+                                break;
+                            }
+                            _currentplayer = player2.Name;
+                            TurnCounter++;
+                        }
+                        else if (_currentplayer == player2.Name)
+                        {
+                            gameBoard.Update(player2.GetMove(), player2);
+                            if (isWinOrTie())
+                            {
+                                break;
+                            }
+                            _currentplayer = player1.Name;
+                            TurnCounter++;
+                        }
                     }
 
                     if (TurnCounter % 2 != 0)
@@ -611,9 +715,28 @@
         public void newGame()
         {
             Console.WriteLine("switching player 1 and player 2 postion");
-            IPlayer tempPlayer = player1;
-            player1 = new Human(player2.Name, "x");
-            player2 = new Human(tempPlayer.Name, "o");
+            if (Aiplayer1 != null)
+            {
+                IPlayer tempPlayer = Aiplayer1;
+                player1 = new Human(player2.Name, "x");
+                Aiplayer2 = new AI(tempPlayer.Name, "o");
+                Aiplayer1 = null;
+                player2 = null;
+            }
+            else if (Aiplayer2 != null)
+            {
+                IPlayer tempPlayer = player1;
+                Aiplayer1 = new AI(Aiplayer2.Name, "x");
+                player2 = new Human(tempPlayer.Name, "o");
+                Aiplayer2 = null;
+                player1 = null;
+            }
+            else
+            {
+                IPlayer tempPlayer = player1;
+                player1 = new Human(player2.Name, "x");
+                player2 = new Human(tempPlayer.Name, "o");
+            }
             setup();
             mainGameloop();
         }
